@@ -152,7 +152,12 @@
             Headers = Get-Neo4jHeader -Credential $Credential
             Method = 'Post'
             Uri = Join-Parts -Parts $BaseUri, 'db/data/transaction/commit'
-            Body = ConvertTo-Json -InputObject $StatementsObject -Depth 10
+            <#
+                Sebastian Bammer-Tasch 06.11.2020 as
+                As the Invoke-Restmethod cmdlet does not convert data to utf-8 we have to convert it beforehand to make sure special characters make it to Neo4j
+            #>
+            #Body = ConvertTo-Json -InputObject $StatementsObject -Depth 10
+            Body = [System.Text.Encoding]::UTF8.GetBytes((ConvertTo-Json -InputObject $StatementsObject -Depth 10))
             ErrorAction = 'Stop'
         }
         Write-Verbose "$($Params | Format-List | Out-String)"
